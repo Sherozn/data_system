@@ -1,0 +1,52 @@
+<div class="home-banner" data-stretch="<%= image_url '/assets/index.jpg' %>">
+	<div class="banner-inner container clearfix">
+	  <div class="home-banner-links">
+	    <%= link_to "发布新帖", "/s", class: "banner-btn btn" %>
+	  </div>
+	  <div class="home-banner-links" style="left: 100px;top: 100px;">
+	    <%= link_to "个人中心", "#", class: "banner-btn btn" %>
+	  </div>
+	  <div class="home-banner-links" style="left: 350px;top: 150px;">
+	    <%= link_to "流浪猫救助活动", "#", class: "banner-btn btn" %>
+	  </div>
+	</div>
+</div>
+<div class="issue-list-header">
+  <div class="container clearfix">
+    <h1 class="issue-list-heading"></h1>
+  </div>
+</div>
+
+<div class="container clearfix">
+	<div class="issue-list">
+	  <% @posts.each do |p| %>
+	    <article class="issue clearfix">
+	      <div class="avatar body">
+	        <!-- 获取发帖用户的名字，get_account_name是在post.rb文件中定义的实例方法 -->
+	        <a class="read-more" href="#"><%= p.get_account_name %></a>
+	        <!-- 获取发帖的时间 -->
+	        <p class="time"><%= p.get_updated_at %></p>
+	      </div>
+	      <div class="body">
+	        <% if p.as_type == 2 %>
+	          <div class="icon-top" title="置顶">置顶</div>
+	        <% elsif p.as_type == 1 %>
+	          <div class="icon-good" title="精">精</div>
+	        <% end %>
+	        <h5 class="title">
+	          <%= link_to "#{p.head}", "/posts/show_posts/#{p.id}" %>
+	        </h5>
+	        <a class="as_sb" href="/posts/show_posts/<%= p.id %>"><%= p.body %></a>
+	      </div>
+	      <div class="issue-comment-count">
+		      <a data-remote="true"><i class="fa fa-comment-o" style="padding-right: 15px;">
+					<!-- 获取评论数，方法还没完善，先设为1 -->
+					<%= "#{p.get_post_items}" %>
+					</i></a>
+	        <%= render :partial => "/home/get_thumbs", :locals => { :p  => p } %>
+	      </div>
+	    </article>
+	  <% end %>
+	</div>
+</div>
+

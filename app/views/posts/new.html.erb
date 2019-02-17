@@ -1,0 +1,16 @@
+<div class="new-issue-form-container clearfix">
+  <div class="new-issue-form clearfix">
+    <%= form_for Post.new,url: "/posts/create" do |f| %>
+      <%= f.hidden_field :account_id %>
+      <dl class="form">
+        <dt><%= f.label "标题" %></dt>
+        <dd><%= f.text_field :head %></dd>
+      </dl>
+      <dl class="form">
+        <dt><%= f.label "内容" %></dt>
+        <dd><%= f.text_area :body %></dd>
+      </dl>
+      <input type="submit" value="发布" class="submit-issue-button btn btn-primary">
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<% @reply_part[2+@step*(@point-1)...2+@step*@point].each do |re| %>
+  replyPage = document.getElementById("reply_page_<%= @comment_id %>");
+  newReply = document.createElement("div");
+  newReply.className = "re-reply";
+  newReply.innerHTML = "<a><%= re.get_account_name %></a><% if re.re_reply_id.blank? %>:<% else %> 回复 <a><%= Comment.find(re.re_reply_id).get_account_name %></a> :<% end %><span id='content_<%= re.id %>'><% if re.status == 0 %><span><%= re.content %></span><% else %><span class='delete-content'>该评论已删除</span><% end %></span><div class='time_right'><%= re.get_created_at %><span id='time_<%= re.id %>'><% if re.status == 0 %><a id='reply<%= re.id %>' onclick='outIn(<%= @comment_id %>,<%=re.id%>)'> 回复</a><% if re.get_account_right(@current_user) %><a data-remote='true' href='/posts/delete_comment/<%= re.id %>' onclick='putDel(<%=re.id%>)'> 删除</a><% end %><% end %></span></div>"
+  replyPage.appendChild(newReply);
+<% end %>
+//找到「更多n条回复 ↓」a标签
+spreadOut = document.getElementById("spread-out");
+//计算目前还剩多少条回复没有展示
+<% space = @reply_part.count - @step*@point - 2 %>
+<% if space > 0 %>
+  spreadOut.innerHTML = "更多<%= space %>条回复 ↓"
+<% else %>
+  spreadOut.style.display = "none";
+<% end %>

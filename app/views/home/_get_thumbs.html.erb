@@ -1,0 +1,37 @@
+<!-- 获取用户是否为此帖子点过赞，分别显示不同的图标 -->
+<% if @current_user && p.get_thumb_info(@current_user.id) %>
+<!-- 在标签内加上,data-remote="true"实现ajax,不然用户点击点赞按钮，整个页面会刷新，影响体验。
+Ajax 是一种在无需重新加载整个网页的情况下，能够更新部分网页的技术。 -->
+  <a data-remote="true" href="/posts/create_thumb/<%= p.id %>/0" id="reduce" class="fa fa-thumbs-up" onclick="praiseReplay(this)">
+    <%= "#{p.get_thumbs}"%>
+  </a>
+<%elsif @current_user%>
+  <a data-remote="true" href="/posts/create_thumb/<%= p.id %>/1" id="increase" class="fa fa-thumbs-o-up" onclick="praiseReplay(this)">
+    <%= "#{p.get_thumbs}"%>
+  </a>
+<% else %>
+<!-- 没有账户登录时的情况 -->
+	<a data-remote="true" href="/home/login_in" class="fa fa-thumbs-o-up" onclick="alert('您还未登录，请先登录')">
+    <%= "#{p.get_thumbs}"%>
+  </a>
+<%end%>
+<script type="text/javascript">
+  function praiseReplay(oldTotal){
+  	if(oldTotal.className == "fa fa-thumbs-up")
+    {
+      oldTotal.className = "fa fa-thumbs-o-up";
+      var oldValue = oldTotal.innerHTML;
+      oldTotal.innerHTML = " " + (parseInt(oldValue) - 1);
+      href = oldTotal.href
+      oldTotal.href = href.substring(0, href.length - 1) + "0"
+    }
+    else
+    {
+      oldTotal.className = "fa fa-thumbs-up";
+      var oldValue = oldTotal.innerHTML;
+      oldTotal.innerHTML = " " + (parseInt(oldValue) + 1);
+      href = oldTotal.href
+      oldTotal.href = href.substring(0, href.length - 1) + "1"
+    }
+  }
+</script>

@@ -1,0 +1,104 @@
+<!-- 遍历as_type为0的评论@comments -->
+<% @comments.each do |comment| %>
+<div class="reply clearfix">
+  <div class="avatar">
+  <!-- get_account_name方法在comment.rb文件中已经定义，用来获取评论者的用户名 -->
+    <a><%= comment.get_account_name %></a>
+  </div>
+  <div class="body">
+  <!-- 评论status为0时代表正常显示，不为0是代表已经被删除，被删除的评论需要显示为「该评论已删除」 -->
+    <span id="content_<%= comment.id %>">
+    <% if comment.status == 0 %>
+      <div><%= comment.content %></div>
+    <% else %>
+      <div class="delete-content">该评论已删除</div>
+    <% end %>
+    </span>
+    <div class="time_right">
+      <!-- 获取评论的创建时间 -->
+      <%= comment.get_created_at %>
+      <!-- 已被删除的帖子不显示回复链接 -->
+      <span id="time_<%= comment.id %>">
+      <% if comment.status == 0 %>
+        <a id="reply<%= comment.id %>" onclick="outIn(<%=comment.id%>,<%=comment.id%>)">回复</a>
+        <% if comment.get_account_right(@current_user) %>
+          <a data-remote="true" href="/posts/delete_comment/<%= comment.id %>" onclick="putDel(<%=comment.id%>)">删除</a>
+        <% end %>
+      <% end %>
+      </span>
+    </div>
+    <div id="reply_page_<%= comment.id %>">
+      <!-- 可以通过re_comment_id字段找到，这个评论下面所有的回复 -->
+      <% @reply = Comment.where(re_comment_id:comment.id,as_type:1) %>
+      <!-- 我们只默认展示两条回复，需要查看更多回复，需要点击查看更多回复
+      @reply.limit(2)的意思是只选择查询结果的前两条数据 -->
+      <% @reply.limit(2).each do |re| %>
+        <div class="re-reply">  
+          <a><%= re.get_account_name %></a>
+          <!-- 如果回复的是评论的回复，该回复用户名后面需要跟被回复用户的用户名，re_reply_id字段保存被回复评论的id；
+          如果直接回复评论，那么回复用户名后面直接跟回复内容，re_reply_id字段为空。-->
+          <% if re.re_reply_id.blank? %>
+            :
+          <% else %>
+            回复 <a><%= Comment.find(re.re_reply_id).get_account_name %></a> :
+          <% end %>
+          <span id="content_<%= re.id %>">
+          <% if re.status == 0 %>
+            <span><%= re.content %></span>
+          <% else %>
+            <span class="delete-content">该评论已删除</span>
+          <% end %>
+          </span>
+          <div class="time_right">
+            <%= re.get_created_at %>
+            <span id="time_<%= re.id %>">
+            <% if re.status == 0 %>
+              <!-- outIn方法控制回复框，当客户点击回复按钮，出现回复框，
+              回复变成取消回复，点击取消回复，回复框收起 -->
+              <a id="reply<%= re.id %>" onclick="outIn(<%= comment.id %>,<%=re.id%>)"> 回复</a>
+              <% if re.get_account_right(@current_user) %>
+                <a data-remote="true" href="/posts/delete_comment/<%= re.id %>" onclick="putDel(<%=re.id%>)">删除</a>
+              <% end %>
+            <% end %>
+            </span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <!-- 当该评论的回复大于两条时，下面会有「查看更多回复」的链接，点击会查看到更多回复
+    主要通过js的控制点击查看更多回复，后面会讲到 -->
+    <% if @reply.count > 2 %>
+      <a id="spread-out" name="1" data-remote="true" href="/posts/show_replys/<%= comment.id %>/0" onclick="addPoint(this)">更多<%= @reply.count - 2 %>条回复 ↓</a>
+    <% end %>
+  </div>
+  <!-- 回复框的内容 -->
+  <%= form_for Comment.new,url: "/posts/create_comment" do |f| %>
+  <!-- 给每个评论的回复框的id都加上comment.id，这样每个评论都有唯一的id，这样才能通过js控制回复框出现在相应的评论下 -->
+    <div class="comment-form reply-from" id="co-reply<%= comment.id %>" style="display:none;">
+      <input type="text" name="comment" placeholder="写下你的回复..." class="comment-text">
+      <div class="comment-submit">
+        <input type="submit" value="回复" class="submit-issue-button btn btn-primary">
+      </div>
+      <input type="hidden" name="comment_id" value="<%=comment.id%>">
+      <input type="hidden" name="post_id" value="<%=comment.post_id%>">
+      <input type="hidden" name="as_type" value="1">
+    </div>
+  <% end %>
+</div>
+<%end%>
+<div class="dataTables_paginate">
+  <%= paginate @comments,:remote => true %> 
+</div>  
+<script type="text/javascript">
+  function addPoint(oldA){
+    href = oldA.href;
+    arr_point = href.split("/")[6];
+    oldA.href = href.substring(0, href.length - 1) + (parseInt(arr_point)+ 1);
+  }
+  function putDel(comment_id) {
+    var content = document.getElementById("content_" + comment_id);
+    var timeRight = document.getElementById("time_" + comment_id);
+    content.innerHTML = "<span class='delete-content'>该评论已删除</span>";
+    timeRight.style.display = "none";
+  }
+</script>

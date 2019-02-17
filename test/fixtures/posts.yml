@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  head: MyString
+  body: MyText
+  account_id: 1
+  as_type: 1
+  status: 1
+
+two:
+  head: MyString
+  body: MyText
+  account_id: 1
+  as_type: 1
+  status: 1

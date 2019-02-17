@@ -1,0 +1,64 @@
+<div class="container" style="width: 60%">
+<article class="clearfix">
+  <div class="avatar body">
+    <!-- 获取发帖用户的名字，get_account_name是在post.rb文件中定义的实例方法 -->
+    <a class="read-more" href="#"><%= @post.get_account_name %></a>
+    <!-- 获取用户的角色信息，ROLE是在account.rb文件中定义的常量数组，通过Account::ROLE调用该数组 -->
+    <p class="time"><%= Account::ROLE[Account.find(@post.account_id).role] %></p>
+  </div>
+  <div class="head"><%= @post.head %></div>
+  <div>
+  <%= @post.body %>
+  </div>
+  <div class="time_right padding-thumb">
+    <!-- 锚点定位，点击会定位到id为co-point的元素 -->
+    <a href="#co-point"><i class="fa fa-comment-o">
+    <!-- 获取评论数,get_post_items方法在app/models/post.rb中定义 -->
+    <%= "#{@post.get_post_items}" %>
+    </i></a>
+    <!-- 加载partial文件，传递@post参数 -->
+    <%= render :partial => "/home/get_thumbs", :locals => { :p  => @post } %>
+    <!-- 帖子最后的修改时间 -->
+    <%= @post.updated_at.strftime ("%Y-%m-%d %H:%M") %>
+  </div>
+</article>
+<div id="data_content">
+  <%= render :partial => "/posts/show_posts"%>
+</div> 
+ <!-- 评论框的内容 -->
+<%= form_for Comment.new,url: "/posts/create_comment" do |f| %>
+  <!-- 评框的id为co-point，id后面不需要加上每个评论的id，因为评论框会出现在页面最下方，与每个评论的位置没有关系 -->
+  <div class="comment-form" name="co-point" id="co-point">
+    <input type="text" name="comment" placeholder="写下你的评论..." class="comment-text">
+    <div class="comment-submit">
+      <input type="submit" value="发布" class="submit-issue-button btn btn-primary">
+    </div>
+    <input type="hidden" name="post_id" value="<%=@post.id%>">
+    <input type="hidden" name="as_type" value="0">
+  </div>
+<% end %>
+</div>
+<!-- 先判断当前是否有用户登录，没有用户登录的话，需要提示登录。coReply为评论框对象，coA为回复a标签对象。
+当点击回复a标签，coReply为未显示状态时，将未显示状态改为显示，回复改为取消回复
+当coReply为显示状态时，将显示状态改为未显示，取消回复改为回复 -->
+<script type="text/javascript">
+  function outIn(comment_id,reply_id){
+    <% if @current_user %>
+      //coReply为评论框对象
+      var coReply = document.getElementById("co-reply" + comment_id);
+      //coA为回复a标签对象
+      var coA = document.getElementById("reply" + reply_id);
+      if(coReply.style.display == "none"){
+        coReply.style.display = "block";
+        coReply.innerHTML = coReply.innerHTML + "<input type='hidden' name='re_reply_id' value='" + reply_id +"'>"
+        coA.innerHTML = "取消回复";
+      }
+      else{
+        coReply.style.display = "none";
+        coA.innerHTML = "回复";
+      }
+    <% else %>
+      alert("您还未登录，请先登录！");
+    <% end %>
+  }
+</script>
