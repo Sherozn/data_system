@@ -35,7 +35,7 @@ gem "rest-client"
 # 分页组件
 gem 'kaminari'
 
-gem 'unicorn'
+gem 'unicorn','5.4.1'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
