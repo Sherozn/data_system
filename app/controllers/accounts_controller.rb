@@ -44,10 +44,10 @@ class AccountsController < ApplicationController
       puts "====boolean======#{boolean}===="
       #boolean为true时说明account保存成功
       if boolean
-      	UserMailer.welcome_email(@account).deliver
-        # subject = "#{name}您好，欢迎加入宠物之家"
-        # html = "#{name}您好，您已注册成功，在宠物之家论坛可以畅所欲言啦~"
-        # response = SendMail.send_mail(email,subject,html)
+      	# UserMailer.welcome_email(@account).deliver
+        subject = "#{name}您好，欢迎加入宠物之家"
+        html = "#{name}您好，您已注册成功，在宠物之家论坛可以畅所欲言啦~"
+        response = SendMail.send_mail(email,subject,html)
         flash.notice = "注册成功！请登录"
         redirect_to :login
       else
